@@ -96,7 +96,11 @@ class ModelOps(object):
 						'comment_content': content
 					}
 					self.matched_comments.append(obj)
-			time.sleep(1)
+			time.sleep(2)
+		if len(self.matched_comments) == 0:
+			post_to_be_deleted = Post.objects.filter(post_url=post_url)
+			for post in post_to_be_deleted:
+				post.delete()
 		return self.matched_comments
 
 	def store_comments(self, post_url):
@@ -110,7 +114,7 @@ class ModelOps(object):
 			comment.save()
 
 		for comment_data in self.matched_comments:
-			post_filtered = Post.objects.filter(post_title=comment_data['post_title'])
+			post_filtered = Post.objects.filter(post_url=post_url)
 			if not post_filtered:
 				post_filtered = Post.objects.create(
 					post_title=comment_data['post_title'],

@@ -25,9 +25,9 @@ def fetch_posts(request):
 		op.set_subreddit(subreddit)
 		posts_data = op.get_posts(page_num)
 		op.store_posts(posts_data)
-		# x = op.get_current_page_HTML(3)
 		return Response(posts_data)
 		# return HttpResponse(posts_data)
+		# return HttpResponse('POST DONE.')
 		# return HttpResponse(subreddit + ' ' + str(page_num))
 	return HttpResponse('Invalid Query')
 
@@ -38,8 +38,9 @@ def fetch_comments(request):
 		op = ModelOps()
 		matched_comments = op.get_comments(post_url)
 		op.store_comments(post_url)
+		# return HttpResponse('COMMENT DONE.')
 		return Response(matched_comments)
-	return HttpResponse('Invalid Query')
+	# return HttpResponse('Invalid Query')
 
 # NOT USED #
 # @api_view(['GET'])
