@@ -3,7 +3,7 @@ from comments.models import Post, Comment
 class PostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Post
-        fields = ['post_title', 'post_url', 'time_created']
+        fields = '__all__'#['post_title', 'post_url', 'time_created']
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:

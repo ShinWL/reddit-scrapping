@@ -20,9 +20,9 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^home/', TemplateView.as_view(template_name='index.html')),
     url('api/fetch_post', views.fetch_posts),
-    url('api/get_database_posts', views.get_database_posts),
-    url('api/get_database_comments', views.get_database_comments),
     url('api/fetch_comments', views.fetch_comments),
+    # url('api/get_database_posts', views.get_database_posts),
+    # url('api/get_database_comments', views.get_database_comments),
     # Serializer
     url('api/Posts/', views.PostListCreate.as_view()),
     url('api/Comments/', views.CommentListCreate.as_view()),

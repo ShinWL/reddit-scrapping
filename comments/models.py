@@ -24,7 +24,7 @@ class Comment(models.Model):
 
 class ModelOps(object):
 	"""docstring for ModelOps"""
-	posts_data = []
+	# posts_data = []
 	matched_comments = []
 	subreddit = ''
 
@@ -34,31 +34,50 @@ class ModelOps(object):
 	def set_subreddit(self, subreddit):
 		self.subreddit = subreddit
 
-	def get_posts(self):
-			headers = {'User-Agent': 'Mozilla/5.0'}
-			page = requests.get(self.subreddit, headers=headers)
+	def get_current_page_HTML(self, page_num):
+		headers = {'User-Agent': 'Mozilla/5.0'}
+		page = requests.get(self.subreddit, headers=headers)
+		for current_page_num in range(page_num):
 			soup = BeautifulSoup(page.text, 'html.parser')
-			for post in soup.find_all('div', class_='thing'):
-				post_title = post.find('p', class_="title").text
-				post_url = 'https://old.reddit.com' + (post.get('data-permalink'))
-				self.posts_data.append({
-					'post_title': post_title,
-					'post_url': post_url 
-					})
-			return self.posts_data
+			next_button = soup.find("span", class_="next-button")
+			if not next_button:
+				break
+			next_page_link = next_button.find("a").attrs['href']
+			time.sleep(2)
+			page = requests.get(next_page_link, headers=headers)
+		return soup
 
-	def store_posts(self):
+
+	def get_posts(self, page_num):
+		# self.posts_data=[]
+		obj_list = []
+		soup = self.get_current_page_HTML(page_num)
+		for post in soup.find_all('div', class_='thing'):
+			post_title = post.find('p', class_="title").text
+			post_url = 'https://old.reddit.com' + (post.get('data-permalink'))
+			obj_list.append({
+				'post_title': post_title,
+				'post_url': post_url 
+				})
+		# self.posts_data = obj_list
+		return obj_list
+
+	def store_posts(self, posts_data):
 		# Post.objects.all().delete()
-		for data in self.posts_data:
-			post = Post.objects.create(
-				post_title=data['post_title'],
-				post_url=data['post_url']
-			)
-			post.save()
+		for data in posts_data:
+			is_created = len(Post.objects.filter(post_url=data['post_url']))
+			if not is_created:
+				post = Post.objects.create(
+					post_title=data['post_title'],
+					post_url=data['post_url']
+				)
+				post.save()
+		
 
 	def get_comments(self, post_url):
 		# db_posts = get_posts_from_database()
 		# for post in db_posts:
+		self.matched_comments = []
 		headers = {'User-Agent': 'Mozilla/5.0'}
 		page = requests.get(post_url, headers=headers)
 		soup = BeautifulSoup(page.text, 'html.parser')
@@ -102,24 +121,26 @@ class ModelOps(object):
 				continue
 			for post_data in post_filtered:
 				save_comments(post_data, comment_data['user_name'], comment_data['comment_content'])
+		
 
-	def get_posts_from_database(self):
-		q = Post.objects.all()
-		obj = []
-		for post in q:
-			obj.append({
-				'post_title': post.post_title,
-				'post_url': post.post_url 
-			})
-		return obj
-
-	def get_comments_from_database(self):
-		q = Comment.objects.all()
-		obj = []
-		for comment in q:
-			obj.append({
-				'post_title': comment.post.post_title,
-				'user': comment.user_name,
-				'content': comment.comment_content
-			})
-		return obj
+	# NOT IN USED #
+	# def get_posts_from_database(self):
+	# 	q = Post.objects.all()
+	# 	obj = []
+	# 	for post in q:
+	# 		obj.append({
+	# 			'post_title': post.post_title,
+	# 			'post_url': post.post_url 
+	# 		})
+	# 	return obj
+	# NOT IN USED
+	# def get_comments_from_database(self):
+	# 	q = Comment.objects.all()
+	# 	obj = []
+	# 	for comment in q:
+	# 		obj.append({
+	# 			'post_title': comment.post.post_title,
+	# 			'user': comment.user_name,
+	# 			'content': comment.comment_content
+	# 		})
+	# 	return obj

@@ -18,18 +18,22 @@ class CommentListCreate(generics.ListCreateAPIView):
 
 @api_view(['GET'])
 def fetch_posts(request):
-	subreddit = request.GET.get('q', '')
+	subreddit = request.GET.get('subreddit', '')
+	page_num = int(request.GET.get('page', '1'))
 	if subreddit:
 		op = ModelOps()
 		op.set_subreddit(subreddit)
-		posts_data = op.get_posts()
-		op.store_posts()
+		posts_data = op.get_posts(page_num)
+		op.store_posts(posts_data)
+		# x = op.get_current_page_HTML(3)
 		return Response(posts_data)
+		# return HttpResponse(posts_data)
+		# return HttpResponse(subreddit + ' ' + str(page_num))
 	return HttpResponse('Invalid Query')
 
 @api_view(['GET'])
 def fetch_comments(request):
-	post_url = request.GET.get('q', '')
+	post_url = request.GET.get('post', '')
 	if post_url:
 		op = ModelOps()
 		matched_comments = op.get_comments(post_url)
@@ -37,10 +41,11 @@ def fetch_comments(request):
 		return Response(matched_comments)
 	return HttpResponse('Invalid Query')
 
-@api_view(['GET'])
-def get_database_posts(request):
-	return Response(ModelOps().get_posts_from_database())
+# NOT USED #
+# @api_view(['GET'])
+# def get_database_posts(request):
+# 	return Response(ModelOps().get_posts_from_database())
 
-@api_view(['GET'])
-def get_database_comments(request):
-	return Response(ModelOps().get_comments_from_database())
+# @api_view(['GET'])
+# def get_database_comments(request):
+# 	return Response(ModelOps().get_comments_from_database())
