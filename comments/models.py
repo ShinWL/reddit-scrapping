@@ -123,7 +123,7 @@ class ModelOps(object):
 				save_comments(post_data, comment_data['user_name'], comment_data['comment_content'])
 		
 
-	# NOT IN USED #
+	# NOT IN USE #
 	# def get_posts_from_database(self):
 	# 	q = Post.objects.all()
 	# 	obj = []
