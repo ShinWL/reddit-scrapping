@@ -28,6 +28,20 @@ const columns = [
 ];
 
 class Main extends React.Component {
+  handleOnClickButtonPosts() {
+    const URL = 'http://127.0.0.1:8000/api/Posts';
+    fetch(URL)
+    .then(resp => resp.json())
+    .then(data => console.log(data))
+  }
+
+  handleOnClickButtonComments() {
+    const URL = 'http://127.0.0.1:8000/api/Comments';
+    fetch(URL)
+    .then(resp => resp.json())
+    .then(data => console.log(data))
+  }
+
   handleOnEnterToLoad(e) {
     const baseURL = 'http://127.0.0.1:8000/api/';
     let input = this.refs.input;
@@ -36,7 +50,8 @@ class Main extends React.Component {
         const postURL = baseURL + 'fetch_post/?subreddit=' +
             input.value + '&page=';
         // 100 pages
-        for (let i = 1; i <= 2; i++) {
+        let counter = 0;
+        for (let i = 1; i <= 100; i++) {
           console.log('Loading page: '+i)
           fetch(postURL + '' + i)
               .then(resp => {
@@ -47,11 +62,13 @@ class Main extends React.Component {
                 const commentURL = baseURL + 'fetch_comments/?post=';
                 for (let j = 0; j < data.length; j++) {
                   fetch(commentURL + data[j].post_url)
-                      .then(() => console.log(
-                          'Done ' + j + ': '+ commentURL + data[j].post_url))
-                }
-              })
-              // .then(()=> console.log('ALL DONE'));
+                      .then(() => {
+                        console.log('Done page: ' + i + ' - post '+ j + ': '+ commentURL + data[j].post_url)
+                        counter += 1;
+                        console.log('Post Completed: ' + counter)
+                        })
+              
+              }})
         }
 
       }
@@ -82,12 +99,14 @@ class Main extends React.Component {
     // }
     return (
         <div>
-          <input type="search"
+          <input type="Enter Subreddit"
                  ref={'input'}
                  onKeyUp={this.handleOnEnterToLoad.bind(this)}
                  placeholder="Subreddit.."/>
-        </div>
+           <button onClick={this.handleOnClickButtonPosts}>All Posts</button>
+        <button onClick={this.handleOnClickButtonComments}>All Comments</button>
 
+        </div>
         // this.props.isLoaded ?
         //     <div align="center">
         //       {/*<Table*/}
