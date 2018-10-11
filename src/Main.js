@@ -51,7 +51,7 @@ class Main extends React.Component {
             input.value + '&page=';
         // 100 pages
         let counter = 0;
-        for (let i = 1; i <= 2; i++) {
+        for (let i = 1; i <= 100; i++) {
           console.log('Loading page: '+i)
           fetch(postURL + '' + i)
               .then(resp => {
@@ -99,7 +99,7 @@ class Main extends React.Component {
     // }
     return (
         <div>
-          <input type="search"
+          <input type="Enter Subreddit"
                  ref={'input'}
                  onKeyUp={this.handleOnEnterToLoad.bind(this)}
                  placeholder="Subreddit.."/>

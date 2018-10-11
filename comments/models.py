@@ -41,6 +41,7 @@ class ModelOps(object):
 			soup = BeautifulSoup(page.text, 'html.parser')
 			next_button = soup.find("span", class_="next-button")
 			if not next_button:
+				return 'End of subreddit.'
 				break
 			next_page_link = next_button.find("a").attrs['href']
 			time.sleep(2)
@@ -52,6 +53,8 @@ class ModelOps(object):
 		# self.posts_data=[]
 		obj_list = []
 		soup = self.get_current_page_HTML(page_num)
+		if(soup == 'End of subreddit.'):
+			return []
 		for post in soup.find_all('div', class_='thing'):
 			post_title = post.find('p', class_="title").text
 			post_url = 'https://old.reddit.com' + (post.get('data-permalink'))
