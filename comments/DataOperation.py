@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import re
-from models import Post, Comment
+from comments.models import Post, Comment
 class SubReddit(object):
 	"""docstring for SubReddit"""
 	url = ''
@@ -107,17 +107,17 @@ class SubReddit(object):
 					post_url=data['post_url']
 				)
 				post.save()
-		self.posts = []
 
 
 	def store_comments(self, post_url):
 		# Comment.objects.all().delete()
+		# Delete post if no matched comments
 		if len(self.comments) == 0:
 			post_to_be_deleted = Post.objects.filter(post_url=post_url)
 			for post in post_to_be_deleted:
 				post.delete()
-			self.comments = []
 			return
+		# Else save comments
 		def save_comments(post, user_name, comment_content):
 			comment = Comment.objects.create(
 					post=post,
@@ -154,8 +154,8 @@ if __name__ == '__main__':
 		content = x.get_posts(i + 1)
 		if(content == 'Terminate.'):
 			break
-
 	# print(x.posts)
+	s.store_posts()
 	for post in x.posts:
 		# print(post['post_url'])
 		x.get_comments(post['post_url'])

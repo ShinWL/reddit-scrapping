@@ -5,7 +5,7 @@ from comments.models import Comment, Post, ModelOps#, get_posts_from_database, g
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 # Create your views here.
-from DataOperation import SubReddit
+from comments.DataOperation import SubReddit
 
 from comments.serializers import PostSerializer, CommentSerializer
 from rest_framework import generics
@@ -23,28 +23,34 @@ def fetch_posts(request):
 	page_num = int(request.GET.get('page', '1'))
 	if subreddit:
 		s = SubReddit()
-		s.set_subreddit(subreddit)
-		posts_data = s.get_posts(page_num)
-		s.store_posts(posts_data)
-		for post in posts_data:
+		s.set_subreddit_url(subreddit)
+		for i in range(page_num):
+			posts_data = s.get_posts(i + 1)
+			if posts_data == 'Terminate.':
+				break
+		s.store_posts()
+		for post in s.posts:
 			s.get_comments(post['post_url'])
 			s.get_more_comments()
 			s.store_comments(post['post_url'])
-		return HttpResponse('Done.')
+		del s
+		return HttpResponse('Subreddit Done.')
 		# return HttpResponse(posts_data)
 		# return HttpResponse('POST DONE.')
 		# return HttpResponse(subreddit + ' ' + str(page_num))
 	return HttpResponse('Invalid Query')
 
-@api_view(['GET'])
-def fetch_comments(request):
-	post_url = request.GET.get('post', '')
-	if post_url:
-		op = ModelOps()
-		matched_comments = op.get_comments(post_url)
-		op.store_comments(post_url)
-		# return HttpResponse('COMMENT DONE.')
-		return Response(matched_comments)
+
+## NOT IN USE ##
+# @api_view(['GET'])
+# def fetch_comments(request):
+# 	post_url = request.GET.get('post', '')
+# 	if post_url:
+# 		op = ModelOps()
+# 		matched_comments = op.get_comments(post_url)
+# 		op.store_comments(post_url)
+# 		# return HttpResponse('COMMENT DONE.')
+# 		return Response(matched_comments)
 	# return HttpResponse('Invalid Query')
 
 # NOT USED #
