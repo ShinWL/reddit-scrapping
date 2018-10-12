@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 import re
-
+from models import Post, Comment
 class SubReddit(object):
 	"""docstring for SubReddit"""
 	url = ''
@@ -55,6 +55,7 @@ class SubReddit(object):
 		r = requests.get(post_url + '.json', headers=headers)
 		comment_threads = r.json()[1]['data']['children']
 		post_title = r.json()[0]['data']['children'][0]['data']['title']
+		post_content = r.json()[0]['data']['children'][0]['data']['url']
 		# print(post_title)
 		if len(comment_threads) == 0:
 			return
@@ -65,13 +66,14 @@ class SubReddit(object):
 			for comment_id in list_id:
 				self.more_comments_url.append(post_url+comment_id+'/')
 		
-		def recursively_get_replies(data, post_title):
+		def recursively_get_replies(data, post_title, post_content):
 			self.counter += 1
 			print('comment counter:',self.counter)
 			if re.search(r'[\w\.-]+@[\w\.-]+', data['body']):
 				self.comments.append(
 					{
 					'post_title': post_title,
+					'post_content': post_content,
 					'user_name' : data['author'],
 					'comment_content': re.findall(r'[\w\.-]+@[\w\.-]+', data['body'])
 					})
@@ -84,16 +86,61 @@ class SubReddit(object):
 					for comment_id in list_id:
 						self.more_comments_url.append(post_url+comment_id+'/')
 					return
-				recursively_get_replies(reply['data'], post_title)
+				recursively_get_replies(reply['data'], post_title, post_content)
 
 		for thread in comment_threads:
 			data = thread['data']
-			recursively_get_replies(data, post_title)
+			recursively_get_replies(data, post_title, post_content)
 
 	def get_more_comments(self):
 		for comment_url in self.more_comments_url:
 			self.get_comments(comment_url)
 		self.more_comments_url = []
+
+	def store_posts(self):
+		# Post.objects.all().delete()
+		for data in self.posts:
+			is_created = len(Post.objects.filter(post_url=data['post_url']))
+			if not is_created:
+				post = Post.objects.create(
+					post_title=data['post_title'],
+					post_url=data['post_url']
+				)
+				post.save()
+		self.posts = []
+
+
+	def store_comments(self, post_url):
+		# Comment.objects.all().delete()
+		if len(self.comments) == 0:
+			post_to_be_deleted = Post.objects.filter(post_url=post_url)
+			for post in post_to_be_deleted:
+				post.delete()
+			self.comments = []
+			return
+		def save_comments(post, user_name, comment_content):
+			comment = Comment.objects.create(
+					post=post,
+					user_name=user_name,
+					comment_content=comment_content
+				)
+			comment.save()
+
+		for comment_data in self.comments:
+			post_filtered = Post.objects.filter(post_url=post_url)
+			if not post_filtered:
+				post_filtered = Post.objects.create(
+					post_title=comment_data['post_title'],
+					post_url=post_url
+					)
+				post_filtered.save()
+				save_comments(post_filtered, comment_data['user_name'], comment_data['comment_content'])
+				continue
+			for post_data in post_filtered:
+				post_data.post_content = comment_data['post_content']
+				post_data.save()
+				save_comments(post_data, comment_data['user_name'], comment_data['comment_content'])
+		self.comments = []
 
 	def __str__(self):
 		return self.url

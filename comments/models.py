@@ -7,6 +7,7 @@ import time
 class Post(models.Model):
 	post_title = models.TextField()
 	post_url = models.URLField()
+	post_content = models.TextField()
 	time_created = models.DateTimeField(auto_now=True)
 
 	def __unicode__(self):
