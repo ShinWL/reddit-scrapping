@@ -79,8 +79,8 @@ def get_comments(post_url, more_comment, comments):
 
 def get_more_comments(more_comment, comments):
 	for comment_url in more_comment:
-		comments = get_comments(comment_url, more_comment, comments)
-	return comments
+		get_comments(comment_url, more_comment, comments)
+	# return comments
 
 def store_posts(posts_data):
 	# Post.objects.all().delete()
@@ -116,10 +116,11 @@ def get_subreddits(reddit):
 	headers = {'User-Agent': 'Mozilla/5.0'}
 	page = requests.get(reddit, headers=headers)
 	soup = BeautifulSoup(page.text, 'html.parser')
-	subreddits = []
-	counter = 0
 	
+	counter = 0
+	subreddits = []
 	while True:
+		
 		for thing in soup.find_all('div', class_='thing'):
 			subreddit_url = 'https://old.reddit.com/' + (thing.get('data-subreddit-prefixed'))
 			subreddits.append(subreddit_url)
