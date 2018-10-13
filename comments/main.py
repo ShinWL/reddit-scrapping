@@ -139,9 +139,9 @@ def get_subreddits(reddit):
 					})
 				store_posts(posts)
 				### STORE COMMENT ###
-				more_comment = []
-				comments = []
 				for post in posts:
+					more_comment = []
+					comments = []
 					print('post:' + str(post))
 					print()
 					get_comments(post['post_url'], more_comment, comments)
