@@ -83,9 +83,9 @@ DATABASES = {
     # }
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'reddit_scraping_db',
-        'USER': 'postgres',
-        'PASSWORD': '1024',
+        'NAME': 'reddit_scrapping_db',
+        'USER': 'weeclicks',
+        'PASSWORD': '7225698',
         'HOST': '',
         'PORT': '',
     }
