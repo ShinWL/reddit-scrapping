@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 # Create your views here.
 from comments.DataOperation import SubReddit
 import comments.main as main 
+import comments.teststore as test 
 from comments.serializers import PostSerializer, CommentSerializer
 from rest_framework import generics
 class PostListCreate(generics.ListCreateAPIView):
@@ -46,6 +47,9 @@ def start_scraping(request):
 	if reddit:
 		main.get_subreddits(reddit)
 
+@api_view(['GET'])
+def start(request):
+	test.start()
 ## NOT IN USE ##
 # @api_view(['GET'])
 # def fetch_comments(request):
