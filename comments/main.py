@@ -149,14 +149,15 @@ def get_subreddits(reddit):
 					get_more_comments(more_comment, comments)
 					print(len(comments))
 					store_comments(post['post_url'], comments)
+					print('post' + str(counter) + ' DONE.')
+					counter += 1
 				next_button = bs.find("span", class_="next-button")
 				if not next_button:
 					print('subreddit DONE.')
 					break
 				next_page_link = next_button.find("a").attrs['href']
 				bs = get_current_page_HTML(next_page_link)
-		print('page' + str(counter) + ' DONE.')
-		counter += 1
+		
 		next_button = soup.find("span", class_="next-button")
 		if not next_button:
 			break
