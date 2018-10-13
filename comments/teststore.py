@@ -47,8 +47,8 @@ def get_comments(post_url, more_comment, comments):
 		recursively_get_replies(data, post_title, post_content)
 def get_more_comments(more_comment, comments):
 	for comment_url in more_comment:
-		comments = get_comments(comment_url, more_comment, comments)
-	return comments
+		get_comments(comment_url, more_comment, comments)
+
 def get_current_page_HTML(url):
 	headers = {'User-Agent': 'Mozilla/5.0'}
 	page = requests.get(url, headers=headers)
@@ -101,7 +101,7 @@ def store_posts(posts_data):
 def start():
 	posts = []
 	counter = 0
-	bs = get_current_page_HTML('https://old.reddit.com/r/Yandex/')
+	bs = get_current_page_HTML('https://old.reddit.com/r/malaysia/')
 	while True:
 		for post in bs.find_all('div', class_='thing'):
 			post_title = post.find('p', class_="title").text
