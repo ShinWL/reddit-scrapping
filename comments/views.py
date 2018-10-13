@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 # Create your views here.
 from comments.DataOperation import SubReddit
-
+import comments.main as main 
 from comments.serializers import PostSerializer, CommentSerializer
 from rest_framework import generics
 class PostListCreate(generics.ListCreateAPIView):
@@ -40,6 +40,11 @@ def fetch_posts(request):
 		# return HttpResponse(subreddit + ' ' + str(page_num))
 	return HttpResponse('Invalid Query')
 
+@api_view(['GET'])
+def start_scraping(request):
+	reddit = request.GET.get('reddit', '')
+	if reddit:
+		main.get_subreddits(reddit)
 
 ## NOT IN USE ##
 # @api_view(['GET'])
