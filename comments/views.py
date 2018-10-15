@@ -5,7 +5,7 @@ from comments.models import Comment, Post, ModelOps#, get_posts_from_database, g
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 # Create your views here.
-from comments.DataOperation import SubReddit
+from comments.DataOperation2 import SubReddit
 import comments.main as main 
 import comments.teststore as test 
 from comments.serializers import PostSerializer, CommentSerializer
@@ -21,19 +21,11 @@ class CommentListCreate(generics.ListCreateAPIView):
 @api_view(['GET'])
 def fetch_posts(request):
 	subreddit = request.GET.get('subreddit', '')
-	page_num = int(request.GET.get('page', '1'))
+	# page_num = int(request.GET.get('page', '1'))
 	if subreddit:
 		s = SubReddit()
 		s.set_subreddit_url(subreddit)
-		for i in range(page_num):
-			posts_data = s.get_posts(i + 1)
-			if posts_data == 'Terminate.':
-				break
-		s.store_posts()
-		for post in s.posts:
-			s.get_comments(post['post_url'])
-			s.get_more_comments()
-			s.store_comments(post['post_url'])
+		s.get_posts()
 		del s
 		return HttpResponse('Subreddit Done.')
 		# return HttpResponse(posts_data)
